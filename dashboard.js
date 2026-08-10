@@ -1,3 +1,5 @@
+import { supabaseClient } from './supabase-client.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Auth Check
     const { data, error: authError } = await supabaseClient.auth.getSession();

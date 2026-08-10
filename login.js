@@ -1,3 +1,5 @@
+import { supabaseClient } from './supabase-client.js';
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Проверяем, авторизован ли пользователь. Если да, перекидываем в дашборд.
     const { data, error: authError } = await supabaseClient.auth.getSession();
