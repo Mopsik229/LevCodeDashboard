@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // Показываем интерфейс (прячем FOUC)
+    document.body.style.opacity = '1';
+
     // Установка email пользователя в профиль
     const userEmailSpan = document.getElementById('current-user-email');
     if (userEmailSpan && session.user.email) {
