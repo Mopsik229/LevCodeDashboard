@@ -23,6 +23,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         userEmailSpan.textContent = session.user.email.split('@')[0];
     }
 
+    // Установка должности
+    const userRoleSpan = document.querySelector('.user-role');
+    if (userRoleSpan) {
+        const role = session.user.user_metadata?.role || 'Сотрудник';
+        userRoleSpan.textContent = role;
+    }
+
     // Логаут
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
