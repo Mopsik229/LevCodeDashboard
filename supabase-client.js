@@ -1,6 +1,6 @@
 // Замените эти значения на данные из вашего проекта Supabase (Settings -> API)
 const SUPABASE_URL = 'https://vqyzzctjymrnymhwwtry.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_secret_9KxgU7o4xPQtHH440jtc1Q_eFA7GLIo';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxeXp6Y3RqeW1ybnltaHd3dHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNjYxNDQsImV4cCI6MjEwMTk0MjE0NH0.ItuTXt1OIJSyIm5qLMzUmAxTJCsgwvubaZKx17-n2dE';
 
 // Инициализация клиента Supabase
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
