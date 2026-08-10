@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LevCode Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="icon" type="image/svg+xml" href="LC_favicon.svg">
+</head>
+
+<body class="dashboard-body">
+    <div class="dashboard-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo"><span>Lev</span><span class="dim">Code</span><span class="bar"></span></div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="overview">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    Обзор
+                </button>
+                <button class="nav-item" data-tab="projects">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Проекты
+                </button>
+                <button class="nav-item" data-tab="clients">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    Клиенты
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <h2 id="page-title">Обзор</h2>
+                <div class="topbar-actions">
+                    <button class="action-btn" aria-label="Уведомления">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    </button>
+                    <div class="user-profile">
+                        <div class="avatar">L</div>
+                        <div class="user-info">
+                            <span class="user-name">Lev</span>
+                            <span class="user-role">Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="tab-content-container">
+                
+                <!-- Overview Tab -->
+                <section id="tab-overview" class="tab-pane active">
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <span class="metric-title">Новые лиды</span>
+                            <div class="metric-value" id="metric-leads">0</div>
+                            <span class="metric-trend positive">В воронке</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-title">В работе</span>
+                            <div class="metric-value" id="metric-active">0</div>
+                            <span class="metric-trend">Проектов</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-title">Завершено</span>
+                            <div class="metric-value" id="metric-completed">0</div>
+                            <span class="metric-trend">За всё время</span>
+                        </div>
+                        <div class="metric-card highlight">
+                            <span class="metric-title">Потенциальная выручка</span>
+                            <div class="metric-value" id="metric-revenue">0 ₽</div>
+                            <span class="metric-trend positive">В пайплайне</span>
+                        </div>
+                    </div>
+
+                    <div class="overview-bento">
+                        <div class="bento-panel recent-leads">
+                            <h3>Последние заявки</h3>
+                            <div class="leads-list" id="recent-leads-list">
+                                <!-- Populated via JS -->
+                            </div>
+                        </div>
+                        <div class="bento-panel active-projects">
+                            <h3>Проекты в разработке</h3>
+                            <div class="projects-list" id="active-projects-list">
+                                <!-- Populated via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Projects Tab -->
+                <section id="tab-projects" class="tab-pane">
+                    <div class="projects-panel">
+                        <div class="projects-header">
+                            <div>
+                                <h3>Управление проектами</h3>
+                                <p class="kanban-desc" style="margin-top:4px;">Все активные лиды и текущие проекты.</p>
+                            </div>
+                            <button class="btn btn-primary" id="btn-add-lead">+ Добавить лид</button>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="clients-table">
+                                <thead>
+                                    <tr>
+                                        <th>Название / Клиент</th>
+                                        <th>Контакт</th>
+                                        <th>Тип проекта</th>
+                                        <th>Этап</th>
+                                        <th>Бюджет</th>
+                                        <th style="text-align: right;">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="projects-table-body">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Clients Tab -->
+                <section id="tab-clients" class="tab-pane">
+                    <div class="clients-panel">
+                        <div class="clients-header">
+                            <h3>В процессе <span class="col-count" id="clients-active-count">0</span></h3>
+                            <div class="search-box">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                <input type="text" id="client-search-active" placeholder="Поиск...">
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="clients-table">
+                                <thead>
+                                    <tr>
+                                        <th>Имя клиента</th>
+                                        <th>Контакты</th>
+                                        <th>Тип проекта</th>
+                                        <th>Бюджет</th>
+                                        <th>Статус</th>
+                                        <th>Дата создания</th>
+                                        <th style="text-align: right;">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clients-table-active">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="clients-panel" style="margin-top: 32px;">
+                        <div class="clients-header" id="completed-clients-header" style="cursor: pointer; user-select: none;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <svg id="completed-toggle-icon" style="transition: transform 0.3s;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                <h3>Завершено <span class="col-count" id="clients-completed-count">0</span></h3>
+                            </div>
+                            <div class="search-box" onclick="event.stopPropagation();">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                <input type="text" id="client-search-completed" placeholder="Поиск...">
+                            </div>
+                        </div>
+                        <div class="table-container" id="completed-clients-body" style="display: none;">
+                            <table class="clients-table">
+                                <thead>
+                                    <tr>
+                                        <th>Имя клиента</th>
+                                        <th>Контакты</th>
+                                        <th>Тип проекта</th>
+                                        <th>Бюджет</th>
+                                        <th>Статус</th>
+                                        <th>Дата создания</th>
+                                        <th style="text-align: right;">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clients-table-completed">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit/View Lead Modal -->
+    <div class="modal-backdrop" id="leadModal">
+        <div class="modal-container">
+            <button class="modal-close" aria-label="Закрыть">&times;</button>
+            <div class="modal-content">
+                <span class="section-tag">Лид</span>
+                <h2 class="modal-title" id="leadModalTitle">Информация</h2>
+                
+                <form class="modal-form" id="leadForm">
+                    <input type="hidden" id="l-id">
+                    <input type="hidden" id="l-stage">
+                    <div class="form-group">
+                        <label for="l-name">Имя</label>
+                        <input type="text" id="l-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="l-contact">Контакт</label>
+                        <input type="text" id="l-contact" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="l-type">Тип проекта</label>
+                            <div class="select-wrapper">
+                                <select id="l-type" required>
+                                    <option value="landing">Лендинг</option>
+                                    <option value="multipage">Многостраничный сайт</option>
+                                    <option value="business-card">Сайт-визитка</option>
+                                    <option value="redesign">Редизайн</option>
+                                    <option value="markup">Вёрстка с макета</option>
+                                    <option value="other">другое</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="l-budget">Бюджет</label>
+                            <div class="select-wrapper">
+                                <select id="l-budget" required>
+                                    <option value="5000">до 5000 ₽</option>
+                                    <option value="5000-10000">от 5000 ₽ до 10000 ₽</option>
+                                    <option value="10000-20000">от 10000 ₽ до 20000 ₽</option>
+                                    <option value="other">другое/обсуждаемо</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="l-desc">Описание</label>
+                        <textarea id="l-desc" rows="4"></textarea>
+                    </div>
+                    <div class="form-actions" style="display: flex; gap: 12px; margin-top: 24px;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">Сохранить</button>
+                        <button type="button" class="btn btn-ghost" id="btn-delete-lead" style="color: #ff5e5e; border-color: rgba(255, 94, 94, 0.3);">Удалить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div class="modal-backdrop" id="notesModal">
+        <div class="modal-container" style="max-width: 600px;">
+            <button class="modal-close" aria-label="Закрыть">&times;</button>
+            <div class="modal-content">
+                <span class="section-tag" id="notesProjectName">Проект</span>
+                <h2 class="modal-title">Заметки</h2>
+                
+                <div class="notes-timeline" id="notesTimeline">
+                    <!-- Populated via JS -->
+                </div>
+
+                <form class="modal-form" id="noteForm" style="margin-top: 32px; border-top: 1px solid var(--border); padding-top: 24px;">
+                    <input type="hidden" id="n-lead-id">
+                    <input type="hidden" id="n-note-id">
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="n-stage">Этап</label>
+                            <div class="select-wrapper">
+                                <select id="n-stage" required>
+                                    <option value="new">Новые заявки</option>
+                                    <option value="brief">01 / Бриф</option>
+                                    <option value="prototype">02 / Прототип</option>
+                                    <option value="design">03 / Дизайн</option>
+                                    <option value="dev">04 / Разработка</option>
+                                    <option value="launch">05 / Запуск</option>
+                                    <option value="completed">Завершено</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="n-text">Добавить заметку</label>
+                        <textarea id="n-text" rows="3" placeholder="Что обсуждали? Какие решения приняли?" required></textarea>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-top: 8px;">
+                        <button type="submit" class="btn btn-primary" id="btn-submit-note" style="flex: 1;">Отправить</button>
+                        <button type="button" class="btn btn-ghost" id="btn-cancel-note" style="display: none; flex: 1;">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
