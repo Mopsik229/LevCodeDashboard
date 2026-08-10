@@ -40,7 +40,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = 'index.html';
             
         } catch (error) {
-            errorMsg.textContent = error.message || 'Ошибка входа. Проверьте почту и пароль.';
+            let msg = error.message;
+            if (msg === 'Invalid login credentials') {
+                msg = 'Неверный email или пароль.';
+            } else if (msg === 'Email not confirmed') {
+                msg = 'Email не подтвержден. Проверьте почту.';
+            } else if (msg === 'User not found') {
+                msg = 'Пользователь с таким email не найден.';
+            } else if (msg && msg.includes('Failed to fetch')) {
+                msg = 'Ошибка сети. Проверьте подключение к интернету.';
+            } else if (!msg) {
+                msg = 'Неизвестная ошибка входа. Попробуйте позже.';
+            }
+            errorMsg.textContent = msg;
             errorMsg.style.display = 'block';
             
             // Восстанавливаем кнопку
