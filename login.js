@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // Проверяем, авторизован ли пользователь. Если да, перекидываем в дашборд.
-    const { data: { session } } = await supabaseClient.auth.getSession();
+    const { data, error: authError } = await supabaseClient.auth.getSession();
+    const session = data?.session;
     
     if (session) {
         window.location.href = 'index.html';

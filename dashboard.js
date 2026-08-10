@@ -1,6 +1,12 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Auth Check
-    const { data: { session } } = await supabaseClient.auth.getSession();
+    const { data, error: authError } = await supabaseClient.auth.getSession();
+    
+    if (authError) {
+        console.error('Auth error:', authError);
+    }
+    
+    const session = data?.session;
     
     if (!session) {
         window.location.href = 'login.html';
