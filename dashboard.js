@@ -189,6 +189,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td class="mono" style="color: var(--accent);">${formatBudget(lead.budget)}</td>
                 <td>
                     <div class="action-group">
+                        ${lead.contract_link ? `<a href="${lead.contract_link}" target="_blank" class="btn-icon" title="Договор" style="color: var(--text); border-color: var(--border);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        </a>` : ''}
                         <button class="btn-icon" title="Заметки" onclick="openNotesModal('${lead.id}')">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                         </button>
@@ -227,6 +230,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td style="color: var(--text-dim);">${dateStr}</td>
             <td>
                 <div class="action-group">
+                    ${lead.contract_link ? `<a href="${lead.contract_link}" target="_blank" class="btn-icon" title="Договор" style="color: var(--text); border-color: var(--border);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                    </a>` : ''}
+                    ${lead.transfer_act_link ? `<a href="${lead.transfer_act_link}" target="_blank" class="btn-icon success" title="Акт передачи" style="color: var(--accent); border-color: rgba(var(--accent-rgb), 0.3);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><polyline points="16 13 8 13"></polyline><polyline points="16 17 8 17"></polyline></svg>
+                    </a>` : ''}
                     <button class="btn-icon" style="color: #ff5e5e; border-color: rgba(255, 94, 94, 0.3);" title="Удалить" onclick="deleteClient('${lead.id}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                     </button>
@@ -261,9 +270,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 7. Global Handlers (for inline onclicks)
     window.closeLead = async function (id) {
-        if (confirm('Закрыть лид и перенести в завершенные?')) {
-            await changeLeadStatus(id, 'completed');
-        }
+        document.getElementById('ta-id').value = id;
+        document.getElementById('ta-link').value = '';
+        document.getElementById('transferActModal').classList.add('is-open');
     };
 
     window.changeLeadStatus = async function (id, newStatus) {
@@ -314,6 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         leadForm.reset();
         document.getElementById('l-id').value = '';
         document.getElementById('l-stage').value = 'new';
+        document.getElementById('l-contract').value = '';
         leadModalTitle.textContent = 'Добавить проект / лид';
         leadModal.classList.add('is-open');
     });
@@ -332,6 +342,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('l-contact').value = lead.contact;
         document.getElementById('l-type').value = lead.type;
         document.getElementById('l-budget').value = lead.budget;
+        document.getElementById('l-contract').value = lead.contract_link || '';
         document.getElementById('l-desc').value = lead.description || '';
 
         leadModalTitle.textContent = 'Редактировать проект';
@@ -352,6 +363,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             contact: document.getElementById('l-contact').value,
             type: document.getElementById('l-type').value,
             budget: document.getElementById('l-budget').value,
+            contract_link: document.getElementById('l-contract').value || null,
             description: document.getElementById('l-desc').value,
             stage: document.getElementById('l-stage').value
         };
@@ -390,6 +402,52 @@ document.addEventListener('DOMContentLoaded', async () => {
             await deleteClient(idVal);
             leadModal.classList.remove('is-open');
         }
+    });
+
+    // Transfer Act Modal Logic
+    const transferActModal = document.getElementById('transferActModal');
+    const transferActForm = document.getElementById('transferActForm');
+
+    document.querySelector('#transferActModal .modal-close').addEventListener('click', () => {
+        transferActModal.classList.remove('is-open');
+    });
+
+    transferActForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const btnSubmit = e.target.querySelector('button[type="submit"]');
+        const origText = btnSubmit.textContent;
+        btnSubmit.textContent = 'Завершение...';
+        btnSubmit.disabled = true;
+
+        const idVal = document.getElementById('ta-id').value;
+        const linkVal = document.getElementById('ta-link').value;
+
+        // DB update for transfer act and status
+        const { error } = await supabaseClient
+            .from('leads')
+            .update({ 
+                stage: 'completed',
+                transfer_act_link: linkVal 
+            })
+            .eq('id', idVal);
+
+        if (error) {
+            console.error('Ошибка завершения проекта:', error);
+            fetchLeads();
+        } else {
+            // Optimistic Update
+            const idx = leads.findIndex(l => l.id === idVal);
+            if (idx > -1) {
+                leads[idx].stage = 'completed';
+                leads[idx].transfer_act_link = linkVal;
+                renderAll();
+            }
+        }
+        
+        btnSubmit.textContent = origText;
+        btnSubmit.disabled = false;
+        transferActModal.classList.remove('is-open');
     });
 
     // 9. Notes Modal Logic

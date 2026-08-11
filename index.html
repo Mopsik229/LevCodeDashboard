@@ -244,6 +244,10 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="l-contract">Ссылка на договор</label>
+                        <input type="url" id="l-contract" placeholder="https://docs.google.com/... (опционально)">
+                    </div>
+                    <div class="form-group">
                         <label for="l-desc">Описание</label>
                         <textarea id="l-desc" rows="4"></textarea>
                     </div>
@@ -294,6 +298,29 @@
                     <div style="display: flex; gap: 12px; margin-top: 8px;">
                         <button type="submit" class="btn btn-primary" id="btn-submit-note" style="flex: 1;">Отправить</button>
                         <button type="button" class="btn btn-ghost" id="btn-cancel-note" style="display: none; flex: 1;">Отмена</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transfer Act Modal -->
+    <div class="modal-backdrop" id="transferActModal">
+        <div class="modal-container" style="max-width: 500px;">
+            <button class="modal-close" aria-label="Закрыть">&times;</button>
+            <div class="modal-content">
+                <span class="section-tag">Завершение проекта</span>
+                <h2 class="modal-title">Акт передачи</h2>
+                <p style="color: var(--text-dim); margin-bottom: 24px; font-size: 14px;">Пожалуйста, прикрепите ссылку на подписанный акт передачи для перевода проекта в завершенные.</p>
+                
+                <form class="modal-form" id="transferActForm">
+                    <input type="hidden" id="ta-id">
+                    <div class="form-group">
+                        <label for="ta-link">Ссылка на акт передачи</label>
+                        <input type="url" id="ta-link" placeholder="https://docs.google.com/..." required>
+                    </div>
+                    <div class="form-actions" style="margin-top: 24px;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Сохранить и завершить проект</button>
                     </div>
                 </form>
             </div>
