@@ -168,6 +168,34 @@
                     </div>
 
                     <div class="clients-panel" style="margin-top: 32px;">
+                        <div class="clients-header">
+                            <h3>Входящие <span class="col-count" id="clients-incoming-count">0</span></h3>
+                            <div class="search-box">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                <input type="text" id="client-search-incoming" placeholder="Поиск...">
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="clients-table">
+                                <thead>
+                                    <tr>
+                                        <th>Имя клиента</th>
+                                        <th>Контакты</th>
+                                        <th>Тип проекта</th>
+                                        <th>Бюджет</th>
+                                        <th>Статус</th>
+                                        <th>Дата создания</th>
+                                        <th style="text-align: right;">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clients-table-incoming">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="clients-panel" style="margin-top: 32px;">
                         <div class="clients-header" id="completed-clients-header" style="cursor: pointer; user-select: none;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <svg id="completed-toggle-icon" style="transition: transform 0.3s;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>

@@ -247,22 +247,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderClientsTables() {
         const tbodyActive = document.getElementById('clients-table-active');
+        const tbodyIncoming = document.getElementById('clients-table-incoming');
         const tbodyCompleted = document.getElementById('clients-table-completed');
 
         tbodyActive.innerHTML = '';
+        tbodyIncoming.innerHTML = '';
         tbodyCompleted.innerHTML = '';
 
         const queryActive = document.getElementById('client-search-active').value.toLowerCase();
+        const queryIncoming = document.getElementById('client-search-incoming').value.toLowerCase();
         const queryCompleted = document.getElementById('client-search-completed').value.toLowerCase();
 
-        const activeLeads = leads.filter(l => l.stage !== 'completed' && (l.name.toLowerCase().includes(queryActive) || l.contact.toLowerCase().includes(queryActive)));
+        const activeLeads = leads.filter(l => l.stage !== 'completed' && l.stage !== 'new' && (l.name.toLowerCase().includes(queryActive) || l.contact.toLowerCase().includes(queryActive)));
+        const incomingLeads = leads.filter(l => l.stage === 'new' && (l.name.toLowerCase().includes(queryIncoming) || l.contact.toLowerCase().includes(queryIncoming)));
         const completedLeads = leads.filter(l => l.stage === 'completed' && (l.name.toLowerCase().includes(queryCompleted) || l.contact.toLowerCase().includes(queryCompleted)));
 
         document.getElementById('clients-active-count').textContent = activeLeads.length;
+        document.getElementById('clients-incoming-count').textContent = incomingLeads.length;
         document.getElementById('clients-completed-count').textContent = completedLeads.length;
 
         if (activeLeads.length === 0) tbodyActive.innerHTML = '<tr><td colspan="7" class="empty-state">Нет данных</td></tr>';
         else activeLeads.forEach(l => tbodyActive.appendChild(createClientRow(l)));
+
+        if (incomingLeads.length === 0) tbodyIncoming.innerHTML = '<tr><td colspan="7" class="empty-state">Нет данных</td></tr>';
+        else incomingLeads.forEach(l => tbodyIncoming.appendChild(createClientRow(l)));
 
         if (completedLeads.length === 0) tbodyCompleted.innerHTML = '<tr><td colspan="7" class="empty-state">Нет данных</td></tr>';
         else completedLeads.forEach(l => tbodyCompleted.appendChild(createClientRow(l)));
@@ -601,6 +609,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Search listeners
     document.getElementById('client-search-active').addEventListener('input', renderClientsTables);
+    document.getElementById('client-search-incoming').addEventListener('input', renderClientsTables);
     document.getElementById('client-search-completed').addEventListener('input', renderClientsTables);
 
     // Accordion toggle for Completed clients
