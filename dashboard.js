@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Auth Check
     const { data, error: authError } = await supabaseClient.auth.getSession();
-    
+
     if (authError) {
         console.error('Auth error:', authError);
     }
-    
+
     const session = data?.session;
-    
+
     if (!session) {
         window.location.href = 'login.html';
         return;
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         document.getElementById('metric-leads').textContent = newLeads.length;
-        document.getElementById('metric-active').textContent = activeLeads.length;
+        document.getElementById('metric-active').textContent = activeLeads.length - newLeads.length;
         document.getElementById('metric-completed').textContent = completedLeads.length;
         document.getElementById('metric-revenue').textContent = revenue.toLocaleString('ru-RU') + ' ₽';
 
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const tbody = document.getElementById('projects-table-body');
         tbody.innerHTML = '';
 
-        const activeLeads = leads.filter(l => l.stage !== 'completed');
+        const activeLeads = leads.filter(l => l.stage !== 'completed' && l.stage !== 'new');
 
         if (activeLeads.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Нет активных проектов</td></tr>';
@@ -230,6 +230,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td style="color: var(--text-dim);">${dateStr}</td>
             <td>
                 <div class="action-group">
+                    ${lead.stage === 'new' ? `<button class="btn-icon success" style="color: var(--accent); border-color: rgba(var(--accent-rgb), 0.3);" title="Принять в работу" onclick="acceptLead('${lead.id}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </button>` : ''}
                     ${lead.contract_link ? `<a href="${lead.contract_link}" target="_blank" class="btn-icon" title="Договор" style="color: var(--text); border-color: var(--border);">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                     </a>` : ''}
@@ -277,6 +280,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 7. Global Handlers (for inline onclicks)
+    window.acceptLead = async function (id) {
+        await changeLeadStatus(id, 'brief'); // Переводим на этап "01 / Бриф"
+    };
+
     window.closeLead = async function (id) {
         document.getElementById('ta-id').value = id;
         document.getElementById('ta-link').value = '';
@@ -296,7 +303,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .from('leads')
             .update({ stage: newStatus })
             .eq('id', id);
-        
+
         if (error) {
             console.error('Ошибка изменения статуса:', error);
             fetchLeads(); // revert optimistic update on error
@@ -314,7 +321,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .from('leads')
                 .delete()
                 .eq('id', id);
-            
+
             if (error) {
                 console.error('Ошибка удаления:', error);
                 fetchLeads(); // revert on error
@@ -327,12 +334,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     const leadForm = document.getElementById('leadForm');
     const leadModalTitle = document.getElementById('leadModalTitle');
 
+    function setLeadFormMode(mode) {
+        const inputs = leadForm.querySelectorAll('input:not([type="hidden"]), select, textarea');
+        const btnSave = document.getElementById('btn-save-lead');
+        const btnEdit = document.getElementById('btn-edit-lead-mode');
+
+        if (mode === 'view') {
+            inputs.forEach(el => el.disabled = true);
+            if (btnSave) btnSave.style.display = 'none';
+            if (btnEdit) btnEdit.style.display = 'block';
+        } else {
+            inputs.forEach(el => el.disabled = false);
+            if (btnSave) btnSave.style.display = 'block';
+            if (btnEdit) btnEdit.style.display = 'none';
+        }
+    }
+
+    document.getElementById('btn-edit-lead-mode')?.addEventListener('click', () => {
+        setLeadFormMode('edit');
+    });
+
     document.getElementById('btn-add-lead').addEventListener('click', () => {
         leadForm.reset();
         document.getElementById('l-id').value = '';
         document.getElementById('l-stage').value = 'new';
         document.getElementById('l-contract').value = '';
         leadModalTitle.textContent = 'Добавить проект / лид';
+        setLeadFormMode('edit');
         leadModal.classList.add('is-open');
     });
 
@@ -353,13 +381,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('l-contract').value = lead.contract_link || '';
         document.getElementById('l-desc').value = lead.description || '';
 
-        leadModalTitle.textContent = 'Редактировать проект';
+        leadModalTitle.textContent = 'Информация';
+        setLeadFormMode('view');
         leadModal.classList.add('is-open');
     };
 
     leadForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const btnSubmit = e.target.querySelector('button[type="submit"]');
         const origText = btnSubmit.textContent;
         btnSubmit.textContent = 'Сохранение...';
@@ -398,7 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Подписка на вебсокеты сама вызовет fetchLeads() и перерисует дашборд.
         // Если без вебсокетов: await fetchLeads();
-        
+
         btnSubmit.textContent = origText;
         btnSubmit.disabled = false;
         leadModal.classList.remove('is-open');
@@ -422,7 +451,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     transferActForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const btnSubmit = e.target.querySelector('button[type="submit"]');
         const origText = btnSubmit.textContent;
         btnSubmit.textContent = 'Завершение...';
@@ -434,9 +463,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // DB update for transfer act and status
         const { error } = await supabaseClient
             .from('leads')
-            .update({ 
+            .update({
                 stage: 'completed',
-                transfer_act_link: linkVal 
+                transfer_act_link: linkVal
             })
             .eq('id', idVal);
 
@@ -452,7 +481,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderAll();
             }
         }
-        
+
         btnSubmit.textContent = origText;
         btnSubmit.disabled = false;
         transferActModal.classList.remove('is-open');
@@ -478,12 +507,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     window.deleteNote = async function (leadId, noteDate) {
         if (!confirm('Точно удалить заметку?')) return;
-        
+
         const lead = leads.find(l => l.id === leadId);
         if (!lead) return;
-        
+
         const newNotes = (lead.notes || []).filter(n => n.date !== noteDate);
-        
+
         // Optimistic
         lead.notes = newNotes;
         openNotesModal(leadId);
@@ -493,7 +522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             .from('leads')
             .update({ notes: newNotes })
             .eq('id', leadId);
-            
+
         if (error) {
             console.error('Error deleting note:', error);
             fetchLeads();
@@ -558,7 +587,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     noteForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const btnSubmit = e.target.querySelector('button[type="submit"]');
         const origText = btnSubmit.textContent;
         btnSubmit.textContent = 'Сохранение...';
@@ -602,7 +631,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 openNotesModal(leadIdVal); // re-render modal
             }
         }
-        
+
         btnSubmit.textContent = origText;
         btnSubmit.disabled = false;
     });
