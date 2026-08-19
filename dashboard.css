@@ -28,6 +28,36 @@ body {
     overflow-x: hidden;
 }
 ::selection { background: var(--accent-dim); color: #fff; }
+
+/* Custom Scrollbars in site style */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #252830 transparent;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #252830;
+    border-radius: 99px;
+    transition: background 0.2s var(--ease);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #373b47;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
 h1, h2, h3 {
     font-family: 'Unbounded', sans-serif;
     font-weight: 800;
@@ -92,6 +122,23 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     position: relative; transform: translateY(20px);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    scrollbar-width: thin;
+    scrollbar-color: #2b2f3a transparent;
+}
+.modal-container::-webkit-scrollbar {
+    width: 6px;
+}
+.modal-container::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 16px 0;
+}
+.modal-container::-webkit-scrollbar-thumb {
+    background: #2b2f3a;
+    border-radius: 99px;
+    transition: background 0.2s var(--ease);
+}
+.modal-container::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
 }
 .modal-backdrop.is-open .modal-container { transform: translateY(0); }
 .modal-close {
