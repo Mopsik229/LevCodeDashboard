@@ -211,29 +211,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     function createClientRow(lead) {
         const dateStr = new Date(lead.created_at).toLocaleDateString('ru-RU');
         const tr = document.createElement('tr');
+        const isIncoming = lead.stage === 'new';
 
-        let optionsHtml = '';
-        Object.entries(STAGE_NAMES).forEach(([val, label]) => {
-            optionsHtml += `<option value="${val}" ${lead.stage === val ? 'selected' : ''}>${label}</option>`;
-        });
+        let statusCellHtml = '';
+        if (isIncoming) {
+            statusCellHtml = `<span class="li-badge new">Новые заявки</span>`;
+        } else {
+            let optionsHtml = '';
+            Object.entries(STAGE_NAMES).forEach(([val, label]) => {
+                if (val !== 'new') {
+                    optionsHtml += `<option value="${val}" ${lead.stage === val ? 'selected' : ''}>${label}</option>`;
+                }
+            });
+            statusCellHtml = `
+                <select class="status-select" onchange="changeLeadStatus('${lead.id}', this.value)">
+                    ${optionsHtml}
+                </select>
+            `;
+        }
 
         tr.innerHTML = `
             <td style="font-weight: 600;">${lead.name}</td>
             <td class="mono">${lead.contact}</td>
             <td>${lead.type}</td>
             <td class="mono" style="color: var(--accent);">${formatBudget(lead.budget)}</td>
-            <td>
-                <select class="status-select" onchange="changeLeadStatus('${lead.id}', this.value)">
-                    ${optionsHtml}
-                </select>
-            </td>
+            <td>${statusCellHtml}</td>
             <td style="color: var(--text-dim);">${dateStr}</td>
             <td>
                 <div class="action-group">
-                    <button class="btn-icon" title="Подробнее" onclick="openLeadModal('${lead.id}')">
+                    <button class="btn-icon" title="${isIncoming ? 'Просмотр (только чтение)' : 'Редактировать'}" onclick="openLeadModal('${lead.id}')">
+                        ${isIncoming ? `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        ` : `
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                        `}
                     </button>
-                    ${lead.stage === 'new' ? `<button class="btn-icon success" style="color: var(--accent); border-color: rgba(var(--accent-rgb), 0.3);" title="Принять в работу" onclick="acceptLead('${lead.id}')">
+                    ${isIncoming ? `<button class="btn-icon success" style="color: var(--accent); border-color: rgba(var(--accent-rgb), 0.3);" title="Принять в работу" onclick="acceptLead('${lead.id}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </button>` : ''}
                     ${lead.contract_link ? `<a href="${lead.contract_link}" target="_blank" class="btn-icon" title="Договор" style="color: var(--text); border-color: var(--border);">
@@ -337,24 +350,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     const leadForm = document.getElementById('leadForm');
     const leadModalTitle = document.getElementById('leadModalTitle');
 
-    function setLeadFormMode(mode) {
+    function setLeadFormMode(mode, leadStage = null) {
         const inputs = leadForm.querySelectorAll('input:not([type="hidden"]), select, textarea');
         const btnSave = document.getElementById('btn-save-lead');
         const btnEdit = document.getElementById('btn-edit-lead-mode');
+        const btnAccept = document.getElementById('btn-accept-lead-modal');
+        const notice = document.getElementById('lead-incoming-notice');
 
         if (mode === 'view') {
             inputs.forEach(el => el.disabled = true);
             if (btnSave) btnSave.style.display = 'none';
-            if (btnEdit) btnEdit.style.display = 'block';
+
+            if (leadStage === 'new') {
+                // Для входящих заявок редактирование недоступно до принятия
+                if (btnEdit) btnEdit.style.display = 'none';
+                if (btnAccept) btnAccept.style.display = 'block';
+                if (notice) notice.style.display = 'block';
+            } else {
+                if (btnEdit) btnEdit.style.display = 'block';
+                if (btnAccept) btnAccept.style.display = 'none';
+                if (notice) notice.style.display = 'none';
+            }
         } else {
             inputs.forEach(el => el.disabled = false);
             if (btnSave) btnSave.style.display = 'block';
             if (btnEdit) btnEdit.style.display = 'none';
+            if (btnAccept) btnAccept.style.display = 'none';
+            if (notice) notice.style.display = 'none';
         }
     }
 
     document.getElementById('btn-edit-lead-mode')?.addEventListener('click', () => {
         setLeadFormMode('edit');
+    });
+
+    document.getElementById('btn-accept-lead-modal')?.addEventListener('click', async () => {
+        const idVal = document.getElementById('l-id').value;
+        if (idVal) {
+            await acceptLead(idVal);
+            leadModal.classList.remove('is-open');
+        }
     });
 
     document.getElementById('btn-add-lead').addEventListener('click', () => {
@@ -384,8 +419,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('l-contract').value = lead.contract_link || '';
         document.getElementById('l-desc').value = lead.description || '';
 
-        leadModalTitle.textContent = 'Информация';
-        setLeadFormMode('view');
+        leadModalTitle.textContent = lead.stage === 'new' ? 'Входящая заявка' : 'Информация о проекте';
+        setLeadFormMode('view', lead.stage);
         leadModal.classList.add('is-open');
     };
 
