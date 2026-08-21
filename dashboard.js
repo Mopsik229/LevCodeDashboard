@@ -1,20 +1,39 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Auth Check
-    const { data, error: authError } = await supabaseClient.auth.getSession();
-
-    if (authError) {
-        console.error('Auth error:', authError);
+    // 1. Auth Check & Loader
+    const loader = document.getElementById('app-loader');
+    function hideLoader() {
+        if (loader) loader.classList.add('hidden');
     }
 
-    const session = data?.session;
-
-    if (!session) {
-        window.location.href = 'login.html';
+    if (!window.supabaseClient) {
+        window.location.replace('login.html');
         return;
     }
 
-    // Показываем интерфейс (прячем FOUC)
-    document.body.style.opacity = '1';
+    let session = null;
+    try {
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('TIMEOUT')), 6000)
+        );
+        const { data, error: authError } = await Promise.race([
+            window.supabaseClient.auth.getSession(),
+            timeoutPromise
+        ]);
+        if (authError) {
+            console.error('Auth error:', authError);
+        }
+        session = data?.session;
+    } catch (err) {
+        console.warn('Session check failed or timed out:', err);
+    }
+
+    if (!session) {
+        window.location.replace('login.html');
+        return;
+    }
+
+    // Скрываем загрузчик
+    hideLoader();
 
     // Установка email пользователя в профиль
     const userEmailSpan = document.getElementById('current-user-email');
@@ -34,8 +53,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
         btnLogout.addEventListener('click', async () => {
-            await supabaseClient.auth.signOut();
-            window.location.href = 'login.html';
+            try {
+                if (window.supabaseClient) {
+                    await window.supabaseClient.auth.signOut();
+                }
+            } catch (e) {
+                console.warn('Sign out error:', e);
+            }
+            window.location.replace('login.html');
         });
     }
 

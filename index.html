@@ -12,9 +12,26 @@
         rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
     <link rel="icon" type="image/svg+xml" href="LC_favicon.svg">
+    <script>
+        // Быстрая проверка наличия токена в localStorage до отрисовки
+        try {
+            const hasToken = Object.keys(localStorage).some(k => k.startsWith('sb-') && k.endsWith('-auth-token') && localStorage.getItem(k) && localStorage.getItem(k) !== 'null');
+            if (!hasToken) {
+                window.location.replace('login.html');
+            }
+        } catch (e) {}
+    </script>
 </head>
 
-<body class="dashboard-body" style="opacity: 0; transition: opacity 0.3s ease;">
+<body class="dashboard-body">
+    <!-- Fullscreen App Loader -->
+    <div id="app-loader" class="app-loader">
+        <div class="loader-content">
+            <div class="logo"><span>Lev</span><span class="dim">Code</span><span class="bar"></span></div>
+            <div class="loader-spinner"></div>
+        </div>
+    </div>
+
     <div class="dashboard-layout">
         
         <!-- Sidebar Navigation -->
