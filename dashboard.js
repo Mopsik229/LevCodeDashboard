@@ -488,8 +488,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (error) console.error('Error creating lead:', error);
         }
 
-        // Подписка на вебсокеты сама вызовет fetchLeads() и перерисует дашборд.
-        // Если без вебсокетов: await fetchLeads();
+        await fetchLeads();
 
         btnSubmit.textContent = origText;
         btnSubmit.disabled = false;
