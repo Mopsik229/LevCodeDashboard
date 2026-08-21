@@ -111,14 +111,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderAll();
     }
 
-    // Подписка на изменения в реальном времени (WebSockets)
-    supabaseClient
-        .channel('public:leads')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, (payload) => {
-            console.log('Изменение в базе:', payload);
-            fetchLeads(); // Перезапрашиваем данные при любых изменениях
-        })
-        .subscribe();
+    // Периодическое обновление данных (polling каждые 15 секунд вместо WebSockets,
+    // так как Vercel прокси не поддерживает WebSocket соединения)
+    setInterval(() => {
+        fetchLeads();
+    }, 15000);
 
     // 5. Helpers
     function renderAll() {
