@@ -211,6 +211,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <td class="mono" style="color: var(--accent);">${formatBudget(lead.budget)}</td>
                 <td>
                     <div class="action-group">
+                        ${lead.brief_link ? `<a href="${lead.brief_link}" target="_blank" class="btn-icon" title="Бриф" style="color: var(--text); border-color: var(--border);">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        </a>` : ''}
                         ${lead.contract_link ? `<a href="${lead.contract_link}" target="_blank" class="btn-icon" title="Договор" style="color: var(--text); border-color: var(--border);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                         </a>` : ''}
@@ -271,6 +274,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     ${isIncoming ? `<button class="btn-icon success" style="color: var(--accent); border-color: rgba(var(--accent-rgb), 0.3);" title="Принять в работу" onclick="acceptLead('${lead.id}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </button>` : ''}
+                    ${lead.brief_link ? `<a href="${lead.brief_link}" target="_blank" class="btn-icon" title="Бриф" style="color: var(--text); border-color: var(--border);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    </a>` : ''}
                     ${lead.contract_link ? `<a href="${lead.contract_link}" target="_blank" class="btn-icon" title="Договор" style="color: var(--text); border-color: var(--border);">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                     </a>` : ''}
@@ -418,6 +424,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         leadForm.reset();
         document.getElementById('l-id').value = '';
         document.getElementById('l-stage').value = 'new';
+        document.getElementById('l-brief').value = '';
         document.getElementById('l-contract').value = '';
         leadModalTitle.textContent = 'Добавить проект / лид';
         setLeadFormMode('edit');
@@ -438,6 +445,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('l-contact').value = lead.contact;
         document.getElementById('l-type').value = lead.type;
         document.getElementById('l-budget').value = lead.budget;
+        document.getElementById('l-brief').value = lead.brief_link || '';
         document.getElementById('l-contract').value = lead.contract_link || '';
         document.getElementById('l-desc').value = lead.description || '';
 
@@ -460,6 +468,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             contact: document.getElementById('l-contact').value,
             type: document.getElementById('l-type').value,
             budget: document.getElementById('l-budget').value,
+            brief_link: document.getElementById('l-brief').value || null,
             contract_link: document.getElementById('l-contract').value || null,
             description: document.getElementById('l-desc').value,
             stage: document.getElementById('l-stage').value
