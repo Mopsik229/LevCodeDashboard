@@ -56,17 +56,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => reject(new Error('TIMEOUT')), 12000);
             });
 
-            const authPromise = window.supabaseClient.auth.signInWithPassword({
-                email,
-                password,
-            });
+            let authResult;
+            try {
+                const authPromise = window.supabaseClient.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+                authResult = await Promise.race([authPromise, timeoutPromise]);
+                if (authResult.error) {
+                    throw authResult.error;
+                }
+            } catch (err) {
+                const isProxyError = err.message?.includes('JSON') || 
+                                     err.message?.includes('Unexpected') ||
+                                     err.message?.includes('Failed to execute');
 
-            const { data, error } = await Promise.race([authPromise, timeoutPromise]);
-
-            if (error) {
-                throw error;
+                if (isProxyError && window.DIRECT_SUPABASE_URL && window.supabase) {
+                    console.warn('Сбой прокси, попытка прямого подключения к Supabase...', err);
+                    const directClient = window.supabase.createClient(window.DIRECT_SUPABASE_URL, window.SUPABASE_ANON_KEY, {
+                        auth: {
+                            persistSession: true,
+                            autoRefreshToken: true,
+                            detectSessionInUrl: true,
+                            storage: window.localStorage
+                        }
+                    });
+                    const directPromise = directClient.auth.signInWithPassword({ email, password });
+                    authResult = await Promise.race([directPromise, timeoutPromise]);
+                    if (authResult.error) {
+                        throw authResult.error;
+                    }
+                    window.supabaseClient = directClient;
+                } else {
+                    throw err;
+                }
             }
 
+            const { data } = authResult;
             if (data?.session) {
                 // Успешная авторизация - переход в дашборд
                 window.location.href = 'index.html';
@@ -79,8 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (msg === 'TIMEOUT' || msg?.includes('Failed to fetch') || msg?.includes('NetworkError') || error.name === 'AuthRetryableFetchError') {
                 msg = 'Ошибка соединения с базой данных. Проверьте интернет или включенный VPN.';
-            } else if (msg?.includes('Unexpected token') || msg?.includes('not valid JSON')) {
-                msg = 'Ошибка соединения с сервером авторизации (некорректный ответ от прокси).';
+            } else if (msg?.includes('Unexpected token') || msg?.includes('not valid JSON') || msg?.includes('Unexpected end of JSON input') || msg?.includes("Failed to execute 'json'")) {
+                msg = 'Ошибка соединения с сервером авторизации. Проверьте соединение или попробуйте с VPN.';
             } else if (msg === 'Invalid login credentials' || msg?.includes('invalid_credentials')) {
                 msg = 'Неверный email или пароль.';
             } else if (msg === 'Email not confirmed' || msg?.includes('email_not_confirmed')) {

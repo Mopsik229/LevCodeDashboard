@@ -5,9 +5,8 @@
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
 
-# Reverse proxy for Supabase API to bypass ISP blocks and timeouts without VPN
-[[redirects]]
-  from = "/api/supabase/*"
-  to = "https://vqyzzctjymrnymhwwtry.supabase.co/:splat"
-  status = 200
-  force = true
+# Edge Function reverse proxy for Supabase API
+# Handles all methods (POST, GET, etc.) with full body streaming
+[[edge_functions]]
+  path = "/api/supabase/*"
+  function = "supabase-proxy"

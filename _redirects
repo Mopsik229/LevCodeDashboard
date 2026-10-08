@@ -1,2 +1,2 @@
 # Netlify Redirects
-/api/supabase/*  https://vqyzzctjymrnymhwwtry.supabase.co/:splat  200!
+# (Supabase proxying is handled via Netlify Edge Functions in netlify/edge-functions/supabase-proxy.js)

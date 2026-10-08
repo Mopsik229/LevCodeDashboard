@@ -7,6 +7,11 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const isLocal = window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const SUPABASE_URL = isLocal ? DIRECT_SUPABASE_URL : (window.location.origin + '/api/supabase');
 
+// Экспортируем параметры для возможности резервного прямого подключения
+window.DIRECT_SUPABASE_URL = DIRECT_SUPABASE_URL;
+window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
+window.SUPABASE_URL = SUPABASE_URL;
+
 // Инициализация клиента Supabase
 if (window.supabase && typeof window.supabase.createClient === 'function') {
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
