@@ -828,3 +828,7 @@ body.dashboard-body {
     animation: spin 0.8s linear infinite;
 }
 
+/* Hide Netlify Feedback Drawer / HUD toolbar */
+#netlify-hud, #netlify-drawer, netlify-drawer, iframe[id*="netlify"], [data-netlify-site-id] {
+    display: none !important;
+}

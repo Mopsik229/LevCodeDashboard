@@ -1,17 +1,9 @@
 // Конфигурация Supabase проекта
-const DIRECT_SUPABASE_URL = 'https://vqyzzctjymrnymhwwtry.supabase.co';
+const SUPABASE_URL = 'https://vqyzzctjymrnymhwwtry.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxeXp6Y3RqeW1ybnltaHd3dHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzNjYxNDQsImV4cCI6MjEwMTk0MjE0NH0.ItuTXt1OIJSyIm5qLMzUmAxTJCsgwvubaZKx17-n2dE';
 
-// Подключаемся напрямую к Supabase
-const SUPABASE_URL = DIRECT_SUPABASE_URL;
-
-// Экспортируем параметры
-window.DIRECT_SUPABASE_URL = DIRECT_SUPABASE_URL;
-window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
-window.SUPABASE_URL = SUPABASE_URL;
-
 // Инициализация клиента Supabase
-if (window.supabase && typeof window.supabase.createClient === 'function') {
+if (window.supabase?.createClient) {
     window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
             persistSession: true,
@@ -23,5 +15,3 @@ if (window.supabase && typeof window.supabase.createClient === 'function') {
 } else {
     console.error('Supabase SDK не был загружен.');
 }
-
-

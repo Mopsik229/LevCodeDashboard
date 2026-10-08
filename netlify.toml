@@ -4,9 +4,3 @@
   for = "/*"
   [headers.values]
     X-Robots-Tag = "noindex, nofollow"
-
-# Edge Function reverse proxy for Supabase API
-# Handles all methods (POST, GET, etc.) with full body streaming
-[[edge_functions]]
-  path = "/api/supabase/*"
-  function = "supabase-proxy"

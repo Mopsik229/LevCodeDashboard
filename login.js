@@ -56,45 +56,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => reject(new Error('TIMEOUT')), 12000);
             });
 
-            let authResult;
-            try {
-                const authPromise = window.supabaseClient.auth.signInWithPassword({
-                    email,
-                    password,
-                });
-                authResult = await Promise.race([authPromise, timeoutPromise]);
-                if (authResult.error) {
-                    throw authResult.error;
-                }
-            } catch (err) {
-                const isProxyError = err.message?.includes('JSON') || 
-                                     err.message?.includes('Unexpected') ||
-                                     err.message?.includes('Failed to execute');
-
-                if (isProxyError && window.DIRECT_SUPABASE_URL && window.supabase) {
-                    console.warn('Сбой прокси, попытка прямого подключения к Supabase...', err);
-                    const directClient = window.supabase.createClient(window.DIRECT_SUPABASE_URL, window.SUPABASE_ANON_KEY, {
-                        auth: {
-                            persistSession: true,
-                            autoRefreshToken: true,
-                            detectSessionInUrl: true,
-                            storage: window.localStorage
-                        }
-                    });
-                    const directPromise = directClient.auth.signInWithPassword({ email, password });
-                    authResult = await Promise.race([directPromise, timeoutPromise]);
-                    if (authResult.error) {
-                        throw authResult.error;
-                    }
-                    window.supabaseClient = directClient;
-                } else {
-                    throw err;
-                }
+            const authPromise = window.supabaseClient.auth.signInWithPassword({
+                email,
+                password,
+            });
+            const { data, error } = await Promise.race([authPromise, timeoutPromise]);
+            if (error) {
+                throw error;
             }
 
-            const { data } = authResult;
             if (data?.session) {
-                // Успешная авторизация - переход в дашборд
                 window.location.href = 'index.html';
             } else {
                 throw new Error('Не удалось получить сессию авторизации.');

@@ -68,3 +68,8 @@
 .spinner {
     animation: spin 1s linear infinite;
 }
+
+/* Hide Netlify Feedback Drawer / HUD toolbar */
+#netlify-hud, #netlify-drawer, netlify-drawer, iframe[id*="netlify"], [data-netlify-site-id] {
+    display: none !important;
+}
