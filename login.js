@@ -79,6 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (msg === 'TIMEOUT' || msg?.includes('Failed to fetch') || msg?.includes('NetworkError') || error.name === 'AuthRetryableFetchError') {
                 msg = 'Ошибка соединения с базой данных. Проверьте интернет или включенный VPN.';
+            } else if (msg?.includes('Unexpected token') || msg?.includes('not valid JSON')) {
+                msg = 'Ошибка соединения с сервером авторизации (некорректный ответ от прокси).';
             } else if (msg === 'Invalid login credentials' || msg?.includes('invalid_credentials')) {
                 msg = 'Неверный email или пароль.';
             } else if (msg === 'Email not confirmed' || msg?.includes('email_not_confirmed')) {

@@ -1,0 +1,13 @@
+# Netlify Configuration for LevCode Dashboard
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# Reverse proxy for Supabase API to bypass ISP blocks and timeouts without VPN
+[[redirects]]
+  from = "/api/supabase/*"
+  to = "https://vqyzzctjymrnymhwwtry.supabase.co/:splat"
+  status = 200
+  force = true

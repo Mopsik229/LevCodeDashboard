@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Периодическое обновление данных (polling каждые 15 секунд вместо WebSockets,
-    // так как Vercel прокси не поддерживает WebSocket соединения)
+    // так как HTTP-прокси хостинга не поддерживает WebSocket соединения)
     setInterval(() => {
         fetchLeads();
     }, 15000);

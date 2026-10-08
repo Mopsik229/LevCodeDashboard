@@ -1,0 +1,2 @@
+# Netlify Redirects
+/api/supabase/*  https://vqyzzctjymrnymhwwtry.supabase.co/:splat  200!
